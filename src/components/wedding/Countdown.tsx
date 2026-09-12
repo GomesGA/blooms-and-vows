@@ -67,7 +67,7 @@ export function Countdown() {
       <p className="mt-14 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase text-center">
         16 DE JANEIRO DE 2027 — 16H
       </p>
-      <p className="mt-3 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase text-center max-w-md">
+      <p className="mt-6 text-4xl md:text-5xl text-[#FAF5EC] text-center drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
         Rua Josina Luiza Tupinambá, 1062, Morada Nova
       </p>
     </div>
