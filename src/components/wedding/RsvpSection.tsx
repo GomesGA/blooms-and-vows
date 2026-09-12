@@ -26,12 +26,10 @@ export function RsvpSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGuest, setSelectedGuest] = useState<{id: string, name: string} | null>(null);
   const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sua URL oficial do Google
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
 
-  // LER DADOS - Força o navegador a seguir os redirecionamentos do Google
+  // LER DADOS - Agora entende tanto 'no' quanto 'Não vai'
   useEffect(() => {
     const urlSemCache = `${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`;
 
@@ -44,7 +42,12 @@ export function RsvpSection() {
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
         guestsList.forEach(guest => {
           if (data[guest.name]) {
-            initialStatuses[guest.id] = data[guest.name];
+            const val = data[guest.name];
+            if (val === 'yes' || val === 'Confirmado') {
+              initialStatuses[guest.id] = 'yes';
+            } else if (val === 'no' || val === 'Não vai') {
+              initialStatuses[guest.id] = 'no';
+            }
           }
         });
         setStatuses(initialStatuses);
@@ -59,29 +62,27 @@ export function RsvpSection() {
     );
   }, [searchTerm]);
 
-  // SALVAR DADOS - O no-cors burla o bloqueio de segurança do navegador
-  const handleConfirm = async (status: 'yes' | 'no') => {
+  // SALVAR DADOS - Atualiza a tela instantaneamente e salva em plano de fundo
+  const handleConfirm = (status: 'yes' | 'no') => {
     if (!selectedGuest) return;
-    setIsSubmitting(true);
+    
+    const currentGuest = selectedGuest;
+    
+    // 1. Muda a cor do botão e fecha a janela na mesma hora (Zero delay)
+    setStatuses(prev => ({ ...prev, [currentGuest.id]: status }));
+    setSelectedGuest(null);
 
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          nome: selectedGuest.name,
-          status: status === 'yes' ? 'Confirmado' : 'Não vai'
-        }),
-      });
-
-      setStatuses(prev => ({ ...prev, [selectedGuest.id]: status }));
-      setSelectedGuest(null);
-    } catch (error) {
-      console.error("Erro ao salvar:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // 2. Envia para o Google de forma silenciosa
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      keepalive: true, 
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        nome: currentGuest.name,
+        status: status === 'yes' ? 'Confirmado' : 'Não vai'
+      }),
+    }).catch(error => console.error("Erro ao salvar:", error));
   };
 
   return (
@@ -150,22 +151,19 @@ export function RsvpSection() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => handleConfirm('yes')}
-                disabled={isSubmitting}
-                className="bg-[#5C6A3E] hover:bg-[#47512F] text-white py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold shadow-md disabled:opacity-50"
+                className="bg-[#5C6A3E] hover:bg-[#47512F] text-white py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold shadow-md"
               >
-                {isSubmitting ? 'Enviando...' : 'Sim, estarei lá'}
+                Sim, estarei lá
               </button>
               <button
                 onClick={() => handleConfirm('no')}
-                disabled={isSubmitting}
-                className="bg-transparent border border-[#7A6E58]/40 hover:bg-[#7A6E58]/10 text-[#4A3E2E] py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold disabled:opacity-50"
+                className="bg-transparent border border-[#7A6E58]/40 hover:bg-[#7A6E58]/10 text-[#4A3E2E] py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold"
               >
-                {isSubmitting ? 'Enviando...' : 'Não poderei comparecer'}
+                Não poderei comparecer
               </button>
               <button
                 onClick={() => setSelectedGuest(null)}
-                disabled={isSubmitting}
-                className="mt-3 text-[#7A6E58] hover:text-[#4A3E2E] underline text-sm transition-colors disabled:opacity-50"
+                className="mt-3 text-[#7A6E58] hover:text-[#4A3E2E] underline text-sm transition-colors"
               >
                 Cancelar
               </button>
