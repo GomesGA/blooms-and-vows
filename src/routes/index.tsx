@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import floral from "@/assets/floral-frame.png.asset.json";
+import floralRsvp from "@/assets/floral-rsvp-bg.jpg.asset.json";
 import { Reveal } from "@/components/Reveal";
 import { Countdown } from "@/components/wedding/Countdown";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
@@ -47,7 +48,7 @@ function Index() {
           </Reveal>
 
           <Reveal delay={150}>
-            <h1 className="mt-10 font-script text-[3.4rem] leading-none text-gold-deep sm:text-7xl md:text-8xl">
+            <h1 className="mt-10 whitespace-nowrap font-script text-[clamp(2.4rem,8.5vw,5.5rem)] leading-none text-gold-deep">
               Brunna <span className="text-gold">e</span> Luis Felipe
             </h1>
           </Reveal>
@@ -97,8 +98,9 @@ function Index() {
 
       {/* Seção 3 — RSVP */}
       <div
+        className="bg-cream"
         style={{
-          backgroundImage: `url(${floral.url})`,
+          backgroundImage: `url(${floralRsvp.url})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
