@@ -2,19 +2,18 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Countdown } from "@/components/wedding/Countdown";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
 
-// Essa é a linha que faltou! Ela diz ao sistema que esta é a página inicial "/"
 export const Route = createFileRoute('/')({
   component: Index,
 });
 
 function Index() {
   return (
-    // Container principal com Scroll Snap
-    <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory font-serif">
+    // Adicionado scroll-smooth para transições mais fluidas e classes para esconder a barra de rolagem geral
+    <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory font-serif scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       
-      {/* SEÇÃO 1: Apresentação */}
-      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center bg-no-repeat">
-        <div className="absolute inset-0 bg-[#F5EDDC]/50"></div>
+      {/* SEÇÃO 1: Apresentação (Usa o floral-frame.png) */}
+      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-frame.jpg')] bg-cover bg-center bg-no-repeat">
+        <div className="absolute inset-0 bg-[#F5EDDC]/40"></div>
         
         <div className="z-10 text-center flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto">
           <p className="text-sm md:text-base text-[#47512F] uppercase tracking-widest leading-relaxed">
@@ -52,25 +51,19 @@ function Index() {
         <Countdown />
       </section>
 
-      {/* SEÇÃO 3: RSVP (Confirmação de Presença) */}
+      {/* SEÇÃO 3: RSVP (Usa o floral-rsvp-bg.jpg) */}
       <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
-        <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col justify-center overflow-hidden">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl text-[#47512F] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Confirme sua Presença
-            </h2>
-            <p className="text-[#7A6E58]">
-              Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
-            </p>
-          </div>
+        <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col">
           
-          <div className="flex-1 overflow-y-auto pr-2 pb-8">
+          {/* Área da lista conectada ao RsvpSection. A barra de rolagem foi ocultada aqui também. */}
+          <div className="flex-1 overflow-y-auto w-full pt-12 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <RsvpSection />
           </div>
 
-          <p className="text-center text-[#5C6A3E] pb-8 pt-4">
-            Agradecemos de coração a todos que poderão compartilhar esse momento conosco.
+          {/* Mensagem de agradecimento com tamanho aumentado (text-xl md:text-2xl) */}
+          <p className="text-center text-[#5C6A3E] pb-8 pt-2 text-xl md:text-2xl px-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            Agradecemos de coração a todos que poderão compartilhar esse momento tão especial conosco.
           </p>
         </div>
       </section>

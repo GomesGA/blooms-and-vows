@@ -1,212 +1,147 @@
-import { useEffect, useMemo, useState } from "react";
-import { Reveal } from "@/components/Reveal";
-import { GUESTS, normalize } from "@/data/guests";
-import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
+import { useState, useMemo } from "react";
 
-type Status = "confirmed" | "declined";
+// Lista exata de convidados fornecida
+const rawGuests = [
+  "BRUNNA","LUIS FELIPE","ANTÔNIO","CRISTIANE","BIANCA","MARIA LUIZA","MARINA","IZABELLA",
+  "ROSILDA","IROMAR","CORINA","THIAGO","ANA","JOÃO","ROSÂNGELA","FERNANDA","RODRIGO",
+  "ANA LUIZA","ANA BEATRIZ","MARIA EDUARDA","CLAUDIA","ROLDÃO","LETÍCIA","HENRIQUE","MONALISA",
+  "RODRIGO GERVASIO","LIVIA","GUSTAVO","ABIGAIL","ALEUDA","MARIANNA","GUILHERME","SOLANGE",
+  "ILANA","GERALDO","LARA","MATHEUS","ANA LAURA","TÚLIO","GIOVANA","ZENA","GERALDO","JHONATA",
+  "LUDIMILA","JÚLIA","JAYSIONE","CÉLIO","PEDRO","ANA JÚLIA","ELEUSA","ISABEL VERÔNICA","HELENA",
+  "ISABEL GERVASIO","JÚLIO","MARIANA","FÁBIO","ADAUTO","ANDREA","GABRIEL","IZABEL","RONALDO",
+  "RAPHAEL","CAROL","RAFAELA","LORENZO","IAGO","VINICIUS","RAMU","APARECIDA","PRISCILA",
+  "ALESSANDRO","THEODORO","CATARINA","RODOLFO","VANESSA","MELINDA","MARIAH","MARCUS","SIMENE",
+  "ANA","MARCELO","ALEXÂNIA","JHONATA","DANIELA","MIGUEL","DÉBORA","LUCAS","ANDRESSA","PABLO",
+  "LETÍCIA","ANALU","RIBAS","ANTÔNIA","LUCIANA","MARCOS","DAVI","PAULA","RAPHAEL","LUIS",
+  "YASMIM","CECÍLIA","RAFAELA","THEODORO"
+];
 
-/**
- * Opcional: defina VITE_RSVP_WEBHOOK_URL (Zapier / Make / n8n) para receber
- * cada resposta também por webhook, além do banco de dados.
- */
-const WEBHOOK_URL = import.meta.env['VITE_RSVP_WEBHOOK_URL'] as string | undefined;
+// Formata os nomes (Deixa apenas a primeira letra maiúscula) e coloca em ordem alfabética
+const guestsList = rawGuests
+  .map((name, index) => ({
+    id: `g${index}`,
+    name: name.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
 
 export function RsvpSection() {
-  const [query, setQuery] = useState("");
-  const [statuses, setStatuses] = useState<Record<string, Status>>({});
-  const [selected, setSelected] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGuest, setSelectedGuest] = useState<{id: string, name: string} | null>(null);
+  
+  // Estado temporário para simular as respostas na tela (depois o Supabase cuida disso)
+  const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
 
-  useEffect(() => {
-    let active = true;
-    supabase
-      .from("rsvps")
-      .select("guest_name, attending")
-      .then(({ data }) => {
-        if (!active || !data) return;
-        const next: Record<string, Status> = {};
-        data.forEach((row) => {
-          next[row.guest_name] = row.attending ? "confirmed" : "declined";
-        });
-        setStatuses(next);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const results = useMemo(() => {
-    const q = normalize(query);
-    if (!q) return GUESTS;
-    return GUESTS.filter((name) => normalize(name).includes(q));
-  }, [query]);
-
-  async function respond(attending: boolean) {
-    if (!selected) return;
-    setSaving(true);
-    const guestName = selected;
-
-    const { error } = await supabase
-      .from("rsvps")
-      .upsert({ guest_name: guestName, attending }, { onConflict: "guest_name" });
-
-    if (error) {
-      setSaving(false);
-      setFeedback("Não foi possível salvar. Tente novamente em instantes.");
-      return;
-    }
-
-    if (WEBHOOK_URL) {
-      try {
-        await fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            guest_name: guestName,
-            attending,
-            answered_at: new Date().toISOString(),
-          }),
-        });
-      } catch {
-        // O registro no banco já foi salvo; falha de webhook não bloqueia o convidado.
-      }
-    }
-
-    setStatuses((prev) => ({ ...prev, [guestName]: attending ? "confirmed" : "declined" }));
-    setSaving(false);
-    setSelected(null);
-    setFeedback(
-      attending
-        ? `Que alegria, ${guestName}! Sua presença está confirmada.`
-        : `Obrigado por avisar, ${guestName}. Sentiremos sua falta.`,
+  // Filtra a lista de acordo com o que foi digitado (ignorando acentos)
+  const filteredGuests = useMemo(() => {
+    const normalizedSearch = searchTerm.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return guestsList.filter(g =>
+      g.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(normalizedSearch)
     );
-  }
+  }, [searchTerm]);
+
+  const handleConfirm = (status: 'yes' | 'no') => {
+    if (selectedGuest) {
+      setStatuses(prev => ({ ...prev, [selectedGuest.id]: status }));
+      setSelectedGuest(null);
+    }
+  };
 
   return (
-    <section id="rsvp" className="relative px-6 py-20 sm:py-28">
-      <div className="mx-auto max-w-3xl">
-        <Reveal>
-          <h2 className="text-center font-script text-5xl text-gold-deep sm:text-6xl">
-            Confirme sua Presença
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-center text-lg text-ink-soft">
-            Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
-          </p>
-        </Reveal>
+    <div className="flex flex-col h-full w-full relative font-serif">
+      
+      {/* CABEÇALHO FIXO (STICKY) - Fica travado no topo enquanto a lista rola */}
+      <div className="sticky top-0 z-20 bg-[#F5EDDC]/95 backdrop-blur-md pt-8 pb-4 px-4 flex flex-col items-center border-b border-[#5C6A3E]/10 rounded-t-2xl shadow-sm">
+        
+        <h2 className="text-6xl md:text-7xl text-[#96691E] mb-2 drop-shadow-sm text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
+          Confirme sua Presença
+        </h2>
+        
+        <p className="text-[#7A6E58] text-center max-w-lg mb-6 text-sm md:text-base">
+          Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
+        </p>
 
-        <Reveal delay={120}>
-          <div className="mx-auto mt-10 max-w-md">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Digite seu nome..."
-              aria-label="Buscar seu nome na lista de convidados"
-              className="w-full rounded-full border border-border bg-card/70 px-6 py-3 text-center text-lg text-ink outline-none transition-colors placeholder:text-ink-soft/70 focus:border-gold"
-            />
-            <p className="mt-3 text-center text-xs uppercase tracking-[0.16em] text-ink-soft">
-              {results.length} {results.length === 1 ? "convidado" : "convidados"}
-            </p>
-          </div>
-        </Reveal>
-
-        {feedback && (
-          <p className="mt-6 text-center text-base text-olive-deep" role="status">
-            {feedback}
-          </p>
-        )}
-
-        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((name, i) => {
-            const status = statuses[name];
-            return (
-              <Reveal key={name} delay={Math.min(i, 8) * 60}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFeedback(null);
-                    setSelected(name);
-                  }}
-                  className={cn(
-                    "w-full rounded-xl border bg-card/60 px-5 py-4 text-left transition-all hover:-translate-y-0.5 hover:border-gold hover:bg-card",
-                    status === "confirmed" && "border-olive bg-olive/10",
-                    status === "declined" && "border-rose bg-rose/10",
-                    !status && "border-border",
-                  )}
-                >
-                  <span className="block text-lg text-ink">{name}</span>
-                  <span
-                    className={cn(
-                      "mt-1 block text-[0.68rem] uppercase tracking-[0.14em]",
-                      status === "confirmed" && "text-olive-deep",
-                      status === "declined" && "text-rose",
-                      !status && "text-ink-soft/70",
-                    )}
-                  >
-                    {status === "confirmed"
-                      ? "Presença confirmada"
-                      : status === "declined"
-                        ? "Não poderá comparecer"
-                        : "Aguardando resposta"}
-                  </span>
-                </button>
-              </Reveal>
-            );
-          })}
+        <div className="w-full max-w-md relative">
+          <input
+            type="text"
+            placeholder="Digite seu nome..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-white/70 border border-[#B8842E]/40 rounded-full py-3 px-6 text-center text-[#4A3E2E] focus:outline-none focus:border-[#96691E] focus:ring-1 focus:ring-[#96691E] transition-all placeholder:text-[#7A6E58]/60"
+          />
         </div>
+        
+        <p className="text-[10px] md:text-xs tracking-[0.2em] text-[#7A6E58] uppercase mt-4 font-semibold">
+          {filteredGuests.length} {filteredGuests.length === 1 ? 'Convidado' : 'Convidados'}
+        </p>
+      </div>
 
-        {results.length === 0 && (
-          <p className="mt-10 text-center text-lg text-ink-soft">
-            Não encontramos esse nome na lista. Confira a grafia ou fale com os noivos.
-          </p>
+      {/* LISTA MÓVEL SEM BARRA DE ROLAGEM */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {filteredGuests.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-4xl mx-auto pb-10">
+            {filteredGuests.map(guest => (
+              <button
+                key={guest.id}
+                onClick={() => setSelectedGuest(guest)}
+                className={`p-4 border rounded-xl text-center transition-all duration-300 shadow-sm hover:shadow-md ${
+                  statuses[guest.id] === 'yes'
+                    ? 'bg-[#5C6A3E]/10 border-[#5C6A3E]/50'
+                    : statuses[guest.id] === 'no'
+                    ? 'bg-red-900/5 border-red-900/20'
+                    : 'bg-white/50 border-[#B8842E]/20 hover:border-[#B8842E]/60 hover:bg-white/80'
+                }`}
+              >
+                <span className="block text-xl text-[#4A3E2E]">{guest.name}</span>
+                <span className={`text-[10px] tracking-widest uppercase mt-2 block font-medium ${
+                  statuses[guest.id] === 'yes' ? 'text-[#47512F]'
+                  : statuses[guest.id] === 'no' ? 'text-red-700/70'
+                  : 'text-[#7A6E58]/60'
+                }`}>
+                  {statuses[guest.id] === 'yes' ? 'Presença Confirmada'
+                   : statuses[guest.id] === 'no' ? 'Não comparecerá'
+                   : 'Toque para responder'}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-[#7A6E58] mt-8 text-lg">Nenhum nome encontrado.</p>
         )}
       </div>
 
-      {selected && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 px-5 animate-in fade-in"
-          onClick={() => !saving && setSelected(null)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl border border-border bg-cream px-8 py-10 text-center shadow-2xl animate-in fade-in zoom-in-95"
-          >
-            <p className="font-script text-5xl text-gold-deep">{selected}</p>
-            <p className="mt-4 text-lg text-ink">Você poderá comparecer ao nosso casamento?</p>
-
-            <div className="mt-8 flex flex-col gap-3">
+      {/* MODAL DE CONFIRMAÇÃO (Abre ao clicar no nome) */}
+      {selectedGuest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-[#F5EDDC] border border-[#B8842E]/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <h3 className="text-5xl text-[#96691E] mb-2" style={{ fontFamily: "'Alex Brush', cursive" }}>
+              {selectedGuest.name}
+            </h3>
+            <p className="text-[#4A3E2E] mb-8 text-lg">Você poderá comparecer ao nosso casamento?</p>
+            
+            <div className="flex flex-col gap-3">
               <button
-                type="button"
-                disabled={saving}
-                onClick={() => respond(true)}
-                className="w-full rounded-full bg-olive px-6 py-3 text-base uppercase tracking-[0.12em] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                onClick={() => handleConfirm('yes')}
+                className="bg-[#5C6A3E] hover:bg-[#47512F] text-white py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold shadow-md"
               >
                 Sim, estarei lá
               </button>
               <button
-                type="button"
-                disabled={saving}
-                onClick={() => respond(false)}
-                className="w-full rounded-full border border-border bg-transparent px-6 py-3 text-base uppercase tracking-[0.12em] text-ink-soft transition-colors hover:bg-cream-deep disabled:opacity-60"
+                onClick={() => handleConfirm('no')}
+                className="bg-transparent border border-[#7A6E58]/40 hover:bg-[#7A6E58]/10 text-[#4A3E2E] py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold"
               >
                 Não poderei comparecer
               </button>
+              <button
+                onClick={() => setSelectedGuest(null)}
+                className="mt-3 text-[#7A6E58] hover:text-[#4A3E2E] underline text-sm transition-colors"
+              >
+                Cancelar
+              </button>
             </div>
-
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => setSelected(null)}
-              className="mt-5 text-sm uppercase tracking-[0.14em] text-ink-soft underline-offset-4 hover:underline"
-            >
-              Voltar
-            </button>
           </div>
         </div>
       )}
-    </section>
+      
+    </div>
   );
 }
