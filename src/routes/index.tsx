@@ -1,126 +1,76 @@
-import { createFileRoute } from "@tanstack/react-router";
-import floral from "@/assets/floral-frame.png.asset.json";
-import floralRsvp from "@/assets/floral-rsvp-bg.jpg.asset.json";
-import { Reveal } from "@/components/Reveal";
 import { Countdown } from "@/components/wedding/Countdown";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Brunna & Luis Felipe — Confirme sua presença" },
-      {
-        name: "description",
-        content:
-          "Convite de casamento de Brunna e Luis Felipe. 16 de janeiro de 2027, às 16h. Encontre seu nome e confirme sua presença.",
-      },
-      { property: "og:title", content: "Brunna & Luis Felipe — 16.01.2027" },
-      {
-        property: "og:description",
-        content: "Encontre seu nome na lista e confirme sua presença no nosso casamento.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Index,
-});
-
-function Index() {
+export default function Index() {
   return (
-    <main className="min-h-screen bg-cream">
-      {/* Seção 1 — Apresentação */}
-      <section
-        className="relative flex min-h-screen items-center justify-center px-6 py-16"
-        style={{
-          backgroundImage: `url(${floral.url})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="mx-auto w-full max-w-2xl text-center">
-          <Reveal>
-            <p className="mx-auto max-w-md text-sm uppercase leading-relaxed tracking-[0.12em] text-olive-deep sm:text-[0.95rem]">
-              “Para que todos vejam e saibam e considerem e juntamente entendam que a mão do Senhor
-              fez isto…”
-              <span className="mt-2 block text-xs tracking-[0.2em]">Isaías 41:20</span>
-            </p>
-          </Reveal>
-
-          <Reveal delay={150}>
-            <h1 className="mt-10 whitespace-nowrap font-script text-[clamp(2.4rem,8.5vw,5.5rem)] leading-none text-gold-deep">
-              Brunna <span className="text-gold">e</span> Luis Felipe
-            </h1>
-          </Reveal>
-
-          <Reveal delay={300}>
-            <p className="mt-8 text-base uppercase tracking-[0.14em] text-olive">
-              Junto com a benção de Deus e seus pais
-            </p>
-          </Reveal>
-
-          <Reveal delay={420}>
-            <div className="mt-8 grid grid-cols-1 gap-6 text-lg text-ink sm:grid-cols-2 sm:gap-12">
-              <div>
-                <p>Cristiane Lopes de Jesus Gervásio</p>
-                <p>Antônio Gervásio Arantes Neto</p>
-              </div>
-              <div>
-                <p>Rosilda do Carmo Costa Silva</p>
-                <p>Iromar Cosmo da Silva</p>
-              </div>
+    // Container principal com Scroll Snap
+    <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory font-serif">
+      
+      {/* SEÇÃO 1: Apresentação */}
+      {/* Certifique-se de que a imagem floral esteja na pasta public/ como 'floral-rsvp-bg.jpg' */}
+      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center bg-no-repeat">
+        <div className="absolute inset-0 bg-[#F5EDDC]/50"></div> {/* Overlay sutil para leitura */}
+        
+        <div className="z-10 text-center flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto">
+          <p className="text-sm md:text-base text-[#47512F] uppercase tracking-widest leading-relaxed">
+            "Para que todos vejam e saibam e considerem e juntamente entendam que a mão do Senhor fez isto…"
+            <span className="block mt-2 font-bold text-xs">Isaías 41:20</span>
+          </p>
+          
+          <h1 className="text-7xl md:text-8xl text-[#96691E] my-4 font-normal drop-shadow-sm" style={{ fontFamily: "'Alex Brush', cursive" }}>
+            Brunna e Luis Felipe
+          </h1>
+          
+          <p className="text-sm md:text-base text-[#5C6A3E] tracking-[0.15em] uppercase">
+            Junto com a benção de Deus e seus pais
+          </p>
+          
+          <div className="flex flex-col md:flex-row gap-8 md:gap-24 text-center text-[#4A3E2E] text-lg mt-4">
+            <div>
+              <p className="mb-1">Cristiane Lopes de Jesus Gervásio</p>
+              <p>Antônio Gervásio Arantes Neto</p>
             </div>
-          </Reveal>
-
-          <Reveal delay={540}>
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <span className="h-px w-14 bg-gold/60" />
-              <p className="text-sm uppercase tracking-[0.18em] text-gold-deep">
-                Convidam para o seu casamento
-              </p>
-              <span className="h-px w-14 bg-gold/60" />
+            <div>
+              <p className="mb-1">Rosilda do Carmo Costa Silva</p>
+              <p>Iromar Cosmo da Silva</p>
             </div>
-          </Reveal>
-
-          <Reveal delay={660}>
-            <a
-              href="#rsvp"
-              className="mt-12 inline-block rounded-full border border-gold px-8 py-3 text-xs uppercase tracking-[0.18em] text-gold-deep transition-colors hover:bg-gold hover:text-primary-foreground"
-            >
-              Confirmar presença
-            </a>
-          </Reveal>
+          </div>
+          
+          <p className="text-sm md:text-base text-[#5C6A3E] tracking-[0.15em] uppercase mt-8">
+            Convidam para o seu casamento
+          </p>
         </div>
       </section>
 
-      {/* Seção 2 — Contagem regressiva */}
-      <Countdown />
+      {/* SEÇÃO 2: Contagem Regressiva */}
+      {/* Cor de fundo verde oliva escuro idêntica à da sua imagem */}
+      <section className="h-screen w-full snap-start bg-[#4A5543] flex items-center justify-center">
+        <Countdown />
+      </section>
 
-      {/* Seção 3 — RSVP */}
-      <div
-        className="bg-cream"
-        style={{
-          backgroundImage: `url(${floralRsvp.url})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <RsvpSection />
-      </div>
+      {/* SEÇÃO 3: RSVP (Confirmação de Presença) */}
+      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center bg-no-repeat">
+        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
+        <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col justify-center overflow-hidden">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl text-[#47512F] mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Confirme sua Presença
+            </h2>
+            <p className="text-[#7A6E58]">
+              Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
+            </p>
+          </div>
+          
+          {/* Componente RSVP que já está conectado ao Supabase */}
+          <div className="flex-1 overflow-y-auto pr-2 pb-8">
+            <RsvpSection />
+          </div>
 
-      {/* Seção 4 — Agradecimento */}
-      <footer className="bg-cream-deep px-6 py-20 text-center">
-        <Reveal>
-          <p className="mx-auto max-w-2xl text-xl leading-relaxed text-ink sm:text-2xl">
-            Agradecemos de coração a todos que poderão compartilhar esse momento tão especial e
-            inesquecível conosco. Mal podemos esperar para celebrar com vocês!
+          <p className="text-center text-[#5C6A3E] pb-8 pt-4">
+            Agradecemos de coração a todos que poderão compartilhar esse momento conosco.
           </p>
-        </Reveal>
-        <Reveal delay={180}>
-          <p className="mt-10 font-script text-6xl text-gold-deep">B &amp; L</p>
-          <p className="mt-2 text-sm uppercase tracking-[0.3em] text-olive">16.01.2027</p>
-        </Reveal>
-      </footer>
-    </main>
+        </div>
+      </section>
+    </div>
   );
 }

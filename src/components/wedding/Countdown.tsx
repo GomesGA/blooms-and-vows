@@ -1,67 +1,72 @@
 import { useEffect, useState } from "react";
-import { Reveal } from "@/components/Reveal";
-
-const TARGET = new Date("2027-01-16T16:00:00-03:00").getTime();
-
-function diff() {
-  const total = Math.max(0, TARGET - Date.now());
-  return {
-    dias: Math.floor(total / 86400000),
-    horas: Math.floor((total / 3600000) % 24),
-    minutos: Math.floor((total / 60000) % 60),
-    segundos: Math.floor((total / 1000) % 60),
-  };
-}
 
 export function Countdown() {
-  const [time, setTime] = useState<ReturnType<typeof diff> | null>(null);
+  const [timeLeft, setTimeLeft] = useState({
+    dias: 0,
+    horas: 0,
+    minutos: 0,
+    segundos: 0,
+  });
 
   useEffect(() => {
-    setTime(diff());
-    const id = setInterval(() => setTime(diff()), 1000);
-    return () => clearInterval(id);
+    // Definindo a data: 16 de Janeiro de 2027 às 16:00
+    const targetDate = new Date("2027-01-16T16:00:00").getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          dias: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          horas: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutos: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          segundos: Math.floor((difference % (1000 * 60)) / 1000),
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const items: Array<[string, number]> = [
-    ["Dias", time?.dias ?? 0],
-    ["Horas", time?.horas ?? 0],
-    ["Minutos", time?.minutos ?? 0],
-    ["Segundos", time?.segundos ?? 0],
-  ];
+  const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
   return (
-    <section id="contagem" className="w-full bg-olive-deep px-6 py-20 sm:py-24">
-      <Reveal>
-        <h2 className="text-center font-script text-5xl text-cream sm:text-6xl">
-          Contagem Regressiva
-        </h2>
-        <div className="mx-auto mt-4 flex items-center justify-center gap-3">
-          <span className="h-px w-10 bg-gold/70" />
-          <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-          <span className="h-px w-10 bg-gold/70" />
-        </div>
-      </Reveal>
+    <div className="flex flex-col items-center justify-center w-full px-4 text-white">
+      <h2 className="text-5xl md:text-6xl text-[#F9F7F1] mb-6 font-normal drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
+        Contagem Regressiva
+      </h2>
+      
+      {/* Divisor decorativo (Linha fina com losango no meio) */}
+      <div className="flex items-center gap-3 mb-14">
+        <div className="w-16 h-[1px] bg-[#C19B5E]"></div>
+        <div className="w-1.5 h-1.5 rotate-45 bg-[#C19B5E]"></div>
+        <div className="w-16 h-[1px] bg-[#C19B5E]"></div>
+      </div>
 
-      <div className="mx-auto mt-12 flex max-w-2xl flex-wrap items-center justify-center gap-4 sm:gap-6">
-        {items.map(([label, value], i) => (
-          <Reveal key={label} delay={i * 120}>
-            <div className="flex h-24 w-24 flex-col items-center justify-center rounded-2xl border border-gold/50 bg-cream shadow-[0_14px_30px_-16px_rgba(0,0,0,0.5)] sm:h-28 sm:w-28">
-              <span className="text-4xl font-light leading-none text-olive-deep tabular-nums sm:text-5xl">
-                {time ? String(value).padStart(2, "0") : "--"}
+      {/* Caixas do Cronômetro */}
+      <div className="flex gap-4 md:gap-6 justify-center">
+        {Object.entries(timeLeft).map(([unit, value]) => (
+          <div key={unit} className="flex flex-col items-center">
+            {/* Caixa creme */}
+            <div className="bg-[#FAF5EC] w-20 h-24 md:w-[110px] md:h-[130px] rounded-2xl flex flex-col items-center justify-center shadow-xl">
+              {/* Número serifado e verde escuro */}
+              <span className="text-4xl md:text-5xl text-[#2C3E2D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                {formatNumber(value)}
               </span>
-              <span className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-gold-deep">
-                {label}
+              {/* Rótulo dourado */}
+              <span className="text-[9px] md:text-[10px] text-[#B8842E] uppercase tracking-[0.25em] mt-3 font-semibold">
+                {unit}
               </span>
             </div>
-          </Reveal>
+          </div>
         ))}
       </div>
 
-      <Reveal delay={200}>
-        <p className="mt-12 text-center text-sm uppercase tracking-[0.22em] text-cream/85">
-          16 de Janeiro de 2027 — 16h
-        </p>
-      </Reveal>
-    </section>
+      {/* Data e hora no rodapé */}
+      <p className="mt-14 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase">
+        16 DE JANEIRO DE 2027 — 16H
+      </p>
+    </div>
   );
 }
