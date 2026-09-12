@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import floral from "@/assets/floral-frame.png.asset.json";
+import floralRsvp from "@/assets/floral-rsvp-bg.jpg.asset.json";
 import { Reveal } from "@/components/Reveal";
 import { Countdown } from "@/components/wedding/Countdown";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
@@ -97,8 +98,9 @@ function Index() {
 
       {/* Seção 3 — RSVP */}
       <div
+        className="bg-cream"
         style={{
-          backgroundImage: `url(${floral.url})`,
+          backgroundImage: `url(${floralRsvp.url})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
