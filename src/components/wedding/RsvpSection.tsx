@@ -59,18 +59,24 @@ export function RsvpSection() {
     if (!selectedGuest) return;
     const currentGuest = selectedGuest;
     
-    // 1. Muda na tela instantaneamente (Zero delay)
+    // 1. Muda na tela instantaneamente
     setStatuses(prev => ({ ...prev, [currentGuest.id]: status }));
     setSelectedGuest(null);
 
-    // 2. Salva no Supabase (Oficial para o site atualizar)
-    await supabase.from('rsvps').upsert({
+    // 2. Salva no Supabase (com aviso de erro caso falhe)
+    const { error: supabaseError } = await supabase.from('rsvps').upsert({
       guest_id: currentGuest.id,
       name: currentGuest.name,
       status: status
     });
 
-    // 3. Envia para o Google Sheets em background (Não trava a tela)
+    if (supabaseError) {
+      console.error("ERRO SUPABASE:", supabaseError.message);
+    } else {
+      console.log("Supabase: Salvo com sucesso!");
+    }
+
+    // 3. Envia para o Google Sheets em background
     fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors", 
@@ -80,7 +86,9 @@ export function RsvpSection() {
         nome: currentGuest.name,
         status: status === 'yes' ? 'Confirmado' : 'Não vai'
       }),
-    }).catch(error => console.error("Erro background planilha:", error));
+    }).catch(() => {
+      // Ignora erros de rede do Google no console para não sujar a tela
+    });
   };
 
   return (
