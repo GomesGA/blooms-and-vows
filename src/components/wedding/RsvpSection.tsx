@@ -30,24 +30,21 @@ export function RsvpSection() {
   const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // IMPORTANTE: COLE A URL DO SEU GOOGLE APPS SCRIPT ENTRE AS ASPAS ABAIXO
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
-
-  // Puxa as respostas do Google Sheets assim que o site abre
+  const GOOGLE_SCRIPT_URL = "[https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec](https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec)";
   useEffect(() => {
-    if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec") return;
+    const urlSemCache = `${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`;
 
-    fetch(GOOGLE_SCRIPT_URL)
+    fetch(urlSemCache)
       .then(res => res.json())
       .then(data => {
-        console.log("Dados que chegaram da planilha:", data); 
-
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
+        
         guestsList.forEach(guest => {
           if (data[guest.name]) {
             initialStatuses[guest.id] = data[guest.name];
           }
         });
+        
         setStatuses(initialStatuses);
       })
       .catch(err => console.error("Erro ao carregar lista de presenças:", err));
