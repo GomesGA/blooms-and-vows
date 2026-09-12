@@ -47,7 +47,7 @@ function Index() {
           </Reveal>
 
           <Reveal delay={150}>
-            <h1 className="mt-10 font-script text-[3.4rem] leading-none text-gold-deep sm:text-7xl md:text-8xl">
+            <h1 className="mt-10 whitespace-nowrap font-script text-[clamp(2.4rem,8.5vw,5.5rem)] leading-none text-gold-deep">
               Brunna <span className="text-gold">e</span> Luis Felipe
             </h1>
           </Reveal>
