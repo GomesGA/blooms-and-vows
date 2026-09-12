@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 
-// Lista exata de convidados fornecida
 const rawGuests = [
   "BRUNNA","LUIS FELIPE","ANTÔNIO","CRISTIANE","BIANCA","MARIA LUIZA","MARINA","IZABELLA",
   "ROSILDA","IROMAR","CORINA","THIAGO","ANA","JOÃO","ROSÂNGELA","FERNANDA","RODRIGO",
@@ -16,7 +15,6 @@ const rawGuests = [
   "YASMIM","CECÍLIA","RAFAELA","THEODORO"
 ];
 
-// Formata os nomes (Deixa apenas a primeira letra maiúscula) e coloca em ordem alfabética
 const guestsList = rawGuests
   .map((name, index) => ({
     id: `g${index}`,
@@ -30,27 +28,30 @@ export function RsvpSection() {
   const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const GOOGLE_SCRIPT_URL = "[https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec](https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec)";
+  // Sua URL oficial do Google
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
+
+  // LER DADOS - Força o navegador a seguir os redirecionamentos do Google
   useEffect(() => {
     const urlSemCache = `${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`;
 
-    fetch(urlSemCache)
+    fetch(urlSemCache, {
+      method: "GET",
+      redirect: "follow" 
+    })
       .then(res => res.json())
       .then(data => {
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
-        
         guestsList.forEach(guest => {
           if (data[guest.name]) {
             initialStatuses[guest.id] = data[guest.name];
           }
         });
-        
         setStatuses(initialStatuses);
       })
-      .catch(err => console.error("Erro ao carregar lista de presenças:", err));
+      .catch(err => console.error("Erro ao carregar lista:", err));
   }, []);
 
-  // Filtra a lista de acordo com o que foi digitado (ignorando acentos)
   const filteredGuests = useMemo(() => {
     const normalizedSearch = searchTerm.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     return guestsList.filter(g =>
@@ -58,6 +59,7 @@ export function RsvpSection() {
     );
   }, [searchTerm]);
 
+  // SALVAR DADOS - O no-cors burla o bloqueio de segurança do navegador
   const handleConfirm = async (status: 'yes' | 'no') => {
     if (!selectedGuest) return;
     setIsSubmitting(true);
@@ -65,6 +67,7 @@ export function RsvpSection() {
     try {
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors", 
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           nome: selectedGuest.name,
@@ -72,12 +75,10 @@ export function RsvpSection() {
         }),
       });
 
-      // Atualiza a tela imediatamente após salvar
       setStatuses(prev => ({ ...prev, [selectedGuest.id]: status }));
       setSelectedGuest(null);
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Houve um erro ao enviar sua resposta. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,18 +86,13 @@ export function RsvpSection() {
 
   return (
     <div className="flex flex-col h-full w-full relative font-serif">
-      
-      {/* CABEÇALHO FIXO SEM CAIXA DE FUNDO */}
       <div className="sticky top-0 z-20 pt-8 pb-4 px-4 flex flex-col items-center">
-        
         <h2 className="text-6xl md:text-7xl text-[#96691E] mb-2 drop-shadow-sm text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
           Confirme sua Presença
         </h2>
-        
         <p className="text-[#7A6E58] text-center max-w-lg mb-6 text-sm md:text-base drop-shadow-sm">
           Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
         </p>
-
         <div className="w-full max-w-md relative">
           <input
             type="text"
@@ -106,13 +102,11 @@ export function RsvpSection() {
             className="w-full bg-white/70 border border-[#B8842E]/40 rounded-full py-3 px-6 text-center text-[#4A3E2E] focus:outline-none focus:border-[#96691E] focus:ring-1 focus:ring-[#96691E] transition-all placeholder:text-[#7A6E58]/60 shadow-sm"
           />
         </div>
-        
         <p className="text-[10px] md:text-xs tracking-[0.2em] text-[#7A6E58] uppercase mt-4 font-semibold drop-shadow-sm">
           {filteredGuests.length} {filteredGuests.length === 1 ? 'Convidado' : 'Convidados'}
         </p>
       </div>
 
-      {/* LISTA MÓVEL SEM BARRA DE ROLAGEM */}
       <div className="flex-1 overflow-y-auto px-4 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {filteredGuests.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-4xl mx-auto pb-10">
@@ -146,7 +140,6 @@ export function RsvpSection() {
         )}
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO */}
       {selectedGuest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-[#F5EDDC] border border-[#B8842E]/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
@@ -154,7 +147,6 @@ export function RsvpSection() {
               {selectedGuest.name}
             </h3>
             <p className="text-[#4A3E2E] mb-8 text-lg">Você poderá comparecer ao nosso casamento?</p>
-            
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => handleConfirm('yes')}
@@ -181,7 +173,6 @@ export function RsvpSection() {
           </div>
         </div>
       )}
-      
     </div>
   );
 }
