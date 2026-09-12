@@ -76,26 +76,40 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.75rem;
+
+  /* wedding palette */
+  --cream: oklch(0.963 0.018 87);
+  --cream-deep: oklch(0.933 0.031 86);
+  --olive: oklch(0.486 0.056 128);
+  --olive-deep: oklch(0.404 0.048 128);
+  --gold: oklch(0.652 0.115 74);
+  --gold-deep: oklch(0.565 0.114 71);
+  --mustard: oklch(0.723 0.155 77);
+  --rose: oklch(0.76 0.086 3);
+  --ink: oklch(0.386 0.029 71);
+  --ink-soft: oklch(0.545 0.026 78);
+
+  --background: var(--cream);
+  --foreground: var(--ink);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --card-foreground: var(--ink);
+  --popover: var(--cream);
+  --popover-foreground: var(--ink);
+  --primary: var(--olive);
+  --primary-foreground: oklch(0.98 0.012 87);
+  --secondary: var(--cream-deep);
+  --secondary-foreground: var(--olive-deep);
+  --muted: var(--cream-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--gold);
+  --accent-foreground: oklch(0.98 0.012 87);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.86 0.03 86);
+  --input: oklch(0.86 0.03 86);
+  --ring: var(--gold);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
