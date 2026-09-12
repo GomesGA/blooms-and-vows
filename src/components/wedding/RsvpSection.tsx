@@ -40,6 +40,8 @@ export function RsvpSection() {
     fetch(GOOGLE_SCRIPT_URL)
       .then(res => res.json())
       .then(data => {
+        console.log("Dados que chegaram da planilha:", data); // <--- Adicione apenas esta linha
+
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
         guestsList.forEach(guest => {
           if (data[guest.name]) {
