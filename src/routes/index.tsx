@@ -1,15 +1,20 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { Countdown } from "@/components/wedding/Countdown";
 import { RsvpSection } from "@/components/wedding/RsvpSection";
 
-export default function Index() {
+// Essa é a linha que faltou! Ela diz ao sistema que esta é a página inicial "/"
+export const Route = createFileRoute('/')({
+  component: Index,
+});
+
+function Index() {
   return (
     // Container principal com Scroll Snap
     <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory font-serif">
       
       {/* SEÇÃO 1: Apresentação */}
-      {/* Certifique-se de que a imagem floral esteja na pasta public/ como 'floral-rsvp-bg.jpg' */}
       <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center bg-no-repeat">
-        <div className="absolute inset-0 bg-[#F5EDDC]/50"></div> {/* Overlay sutil para leitura */}
+        <div className="absolute inset-0 bg-[#F5EDDC]/50"></div>
         
         <div className="z-10 text-center flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto">
           <p className="text-sm md:text-base text-[#47512F] uppercase tracking-widest leading-relaxed">
@@ -43,7 +48,6 @@ export default function Index() {
       </section>
 
       {/* SEÇÃO 2: Contagem Regressiva */}
-      {/* Cor de fundo verde oliva escuro idêntica à da sua imagem */}
       <section className="h-screen w-full snap-start bg-[#4A5543] flex items-center justify-center">
         <Countdown />
       </section>
@@ -61,7 +65,6 @@ export default function Index() {
             </p>
           </div>
           
-          {/* Componente RSVP que já está conectado ao Supabase */}
           <div className="flex-1 overflow-y-auto pr-2 pb-8">
             <RsvpSection />
           </div>
