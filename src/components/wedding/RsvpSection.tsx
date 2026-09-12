@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const rawGuests = [
   "BRUNNA","LUIS FELIPE","ANTÔNIO","CRISTIANE","BIANCA","MARIA LUIZA","MARINA","IZABELLA",
@@ -27,32 +28,24 @@ export function RsvpSection() {
   const [selectedGuest, setSelectedGuest] = useState<{id: string, name: string} | null>(null);
   const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
 
+  // Sua URL oficial do Google Sheets (apenas para registro em background)
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
 
-  // LER DADOS - Agora entende tanto 'no' quanto 'Não vai'
+  // LER DADOS DO SUPABASE (Muito mais rápido)
   useEffect(() => {
-    const urlSemCache = `${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`;
-
-    fetch(urlSemCache, {
-      method: "GET",
-      redirect: "follow" 
-    })
-      .then(res => res.json())
-      .then(data => {
+    const fetchSupabase = async () => {
+      const { data, error } = await supabase.from('rsvps').select('*');
+      
+      if (!error && data) {
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
-        guestsList.forEach(guest => {
-          if (data[guest.name]) {
-            const val = data[guest.name];
-            if (val === 'yes' || val === 'Confirmado') {
-              initialStatuses[guest.id] = 'yes';
-            } else if (val === 'no' || val === 'Não vai') {
-              initialStatuses[guest.id] = 'no';
-            }
-          }
+        data.forEach(row => {
+          initialStatuses[row.guest_id] = row.status as 'yes' | 'no';
         });
         setStatuses(initialStatuses);
-      })
-      .catch(err => console.error("Erro ao carregar lista:", err));
+      }
+    };
+    
+    fetchSupabase();
   }, []);
 
   const filteredGuests = useMemo(() => {
@@ -62,27 +55,32 @@ export function RsvpSection() {
     );
   }, [searchTerm]);
 
-  // SALVAR DADOS - Atualiza a tela instantaneamente e salva em plano de fundo
-  const handleConfirm = (status: 'yes' | 'no') => {
+  const handleConfirm = async (status: 'yes' | 'no') => {
     if (!selectedGuest) return;
-    
     const currentGuest = selectedGuest;
     
-    // 1. Muda a cor do botão e fecha a janela na mesma hora (Zero delay)
+    // 1. Muda na tela instantaneamente (Zero delay)
     setStatuses(prev => ({ ...prev, [currentGuest.id]: status }));
     setSelectedGuest(null);
 
-    // 2. Envia para o Google de forma silenciosa
+    // 2. Salva no Supabase (Oficial para o site atualizar)
+    await supabase.from('rsvps').upsert({
+      guest_id: currentGuest.id,
+      name: currentGuest.name,
+      status: status
+    });
+
+    // 3. Envia para o Google Sheets em background (Não trava a tela)
     fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",
-      keepalive: true, 
+      mode: "no-cors", 
+      keepalive: true,
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         nome: currentGuest.name,
         status: status === 'yes' ? 'Confirmado' : 'Não vai'
       }),
-    }).catch(error => console.error("Erro ao salvar:", error));
+    }).catch(error => console.error("Erro background planilha:", error));
   };
 
   return (

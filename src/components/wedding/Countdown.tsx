@@ -69,15 +69,4 @@ export function Countdown() {
       </p>
     </div>
   );
-
-  <div className="mt-4 flex flex-col items-center">
-  <p className="text-[10px] md:text-xs tracking-[0.2em] text-[#7A6E58] uppercase font-semibold text-center drop-shadow-sm">
-    Local da Cerimônia
-  </p>
-  <p className="text-[#4A3E2E] text-sm md:text-base mt-1 font-serif text-center drop-shadow-sm">
-    Rua Josina Luiza Tupinambá, 1062, Morada Nova
-  </p>
-</div>
-
-
 }
