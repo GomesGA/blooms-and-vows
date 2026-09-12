@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 // Lista exata de convidados fornecida
 const rawGuests = [
@@ -27,9 +27,29 @@ const guestsList = rawGuests
 export function RsvpSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGuest, setSelectedGuest] = useState<{id: string, name: string} | null>(null);
-  
-  // Estado temporário para simular as respostas na tela (depois o Supabase cuida disso)
   const [statuses, setStatuses] = useState<Record<string, 'yes' | 'no'>>({}); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // IMPORTANTE: COLE A URL DO SEU GOOGLE APPS SCRIPT ENTRE AS ASPAS ABAIXO
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
+
+  // Puxa as respostas do Google Sheets assim que o site abre
+  useEffect(() => {
+    if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec") return;
+
+    fetch(GOOGLE_SCRIPT_URL)
+      .then(res => res.json())
+      .then(data => {
+        const initialStatuses: Record<string, 'yes' | 'no'> = {};
+        guestsList.forEach(guest => {
+          if (data[guest.name]) {
+            initialStatuses[guest.id] = data[guest.name];
+          }
+        });
+        setStatuses(initialStatuses);
+      })
+      .catch(err => console.error("Erro ao carregar lista de presenças:", err));
+  }, []);
 
   // Filtra a lista de acordo com o que foi digitado (ignorando acentos)
   const filteredGuests = useMemo(() => {
@@ -39,24 +59,42 @@ export function RsvpSection() {
     );
   }, [searchTerm]);
 
-  const handleConfirm = (status: 'yes' | 'no') => {
-    if (selectedGuest) {
+  const handleConfirm = async (status: 'yes' | 'no') => {
+    if (!selectedGuest) return;
+    setIsSubmitting(true);
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          nome: selectedGuest.name,
+          status: status === 'yes' ? 'Confirmado' : 'Não vai'
+        }),
+      });
+
+      // Atualiza a tela imediatamente após salvar
       setStatuses(prev => ({ ...prev, [selectedGuest.id]: status }));
       setSelectedGuest(null);
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert("Houve um erro ao enviar sua resposta. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex flex-col h-full w-full relative font-serif">
       
-      {/* CABEÇALHO FIXO (STICKY) - Fica travado no topo enquanto a lista rola */}
-      <div className="sticky top-0 z-20 bg-[#F5EDDC]/95 backdrop-blur-md pt-8 pb-4 px-4 flex flex-col items-center border-b border-[#5C6A3E]/10 rounded-t-2xl shadow-sm">
+      {/* CABEÇALHO FIXO SEM CAIXA DE FUNDO */}
+      <div className="sticky top-0 z-20 pt-8 pb-4 px-4 flex flex-col items-center">
         
         <h2 className="text-6xl md:text-7xl text-[#96691E] mb-2 drop-shadow-sm text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
           Confirme sua Presença
         </h2>
         
-        <p className="text-[#7A6E58] text-center max-w-lg mb-6 text-sm md:text-base">
+        <p className="text-[#7A6E58] text-center max-w-lg mb-6 text-sm md:text-base drop-shadow-sm">
           Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
         </p>
 
@@ -66,11 +104,11 @@ export function RsvpSection() {
             placeholder="Digite seu nome..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/70 border border-[#B8842E]/40 rounded-full py-3 px-6 text-center text-[#4A3E2E] focus:outline-none focus:border-[#96691E] focus:ring-1 focus:ring-[#96691E] transition-all placeholder:text-[#7A6E58]/60"
+            className="w-full bg-white/70 border border-[#B8842E]/40 rounded-full py-3 px-6 text-center text-[#4A3E2E] focus:outline-none focus:border-[#96691E] focus:ring-1 focus:ring-[#96691E] transition-all placeholder:text-[#7A6E58]/60 shadow-sm"
           />
         </div>
         
-        <p className="text-[10px] md:text-xs tracking-[0.2em] text-[#7A6E58] uppercase mt-4 font-semibold">
+        <p className="text-[10px] md:text-xs tracking-[0.2em] text-[#7A6E58] uppercase mt-4 font-semibold drop-shadow-sm">
           {filteredGuests.length} {filteredGuests.length === 1 ? 'Convidado' : 'Convidados'}
         </p>
       </div>
@@ -109,7 +147,7 @@ export function RsvpSection() {
         )}
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO (Abre ao clicar no nome) */}
+      {/* MODAL DE CONFIRMAÇÃO */}
       {selectedGuest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-[#F5EDDC] border border-[#B8842E]/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
@@ -121,19 +159,22 @@ export function RsvpSection() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => handleConfirm('yes')}
-                className="bg-[#5C6A3E] hover:bg-[#47512F] text-white py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold shadow-md"
+                disabled={isSubmitting}
+                className="bg-[#5C6A3E] hover:bg-[#47512F] text-white py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold shadow-md disabled:opacity-50"
               >
-                Sim, estarei lá
+                {isSubmitting ? 'Enviando...' : 'Sim, estarei lá'}
               </button>
               <button
                 onClick={() => handleConfirm('no')}
-                className="bg-transparent border border-[#7A6E58]/40 hover:bg-[#7A6E58]/10 text-[#4A3E2E] py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold"
+                disabled={isSubmitting}
+                className="bg-transparent border border-[#7A6E58]/40 hover:bg-[#7A6E58]/10 text-[#4A3E2E] py-3 px-4 rounded-lg transition-colors text-xs tracking-widest uppercase font-semibold disabled:opacity-50"
               >
-                Não poderei comparecer
+                {isSubmitting ? 'Enviando...' : 'Não poderei comparecer'}
               </button>
               <button
                 onClick={() => setSelectedGuest(null)}
-                className="mt-3 text-[#7A6E58] hover:text-[#4A3E2E] underline text-sm transition-colors"
+                disabled={isSubmitting}
+                className="mt-3 text-[#7A6E58] hover:text-[#4A3E2E] underline text-sm transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
