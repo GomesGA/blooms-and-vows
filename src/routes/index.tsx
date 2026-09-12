@@ -49,15 +49,6 @@ function Index() {
       {/* SEÇÃO 2: Contagem Regressiva */}
       <section className="h-screen w-full snap-start bg-[#4A5543] flex items-center justify-center">
         <Countdown />
-        <div className="mt-8 flex flex-col items-center z-10 w-full px-4">
-          <p className="text-xs md:text-sm tracking-[0.2em] text-[#7A6E58] uppercase font-semibold text-center drop-shadow-sm">
-            Local da Cerimônia
-          </p>
-          <p className="text-[#4A3E2E] text-lg md:text-xl mt-2 font-serif text-center drop-shadow-sm max-w-md">
-            Rua Josina Luiza Tupinambá, 1062, Morada Nova
-          </p>
-        </div>
-        {/* CÓDIGO DO ENDEREÇO TERMINA AQUI */}
       </section>
 
       {/* SEÇÃO 3: RSVP (Usa o floral-rsvp-bg.jpg) */}

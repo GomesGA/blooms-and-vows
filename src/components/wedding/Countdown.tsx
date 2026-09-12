@@ -62,10 +62,13 @@ export function Countdown() {
           </div>
         ))}
       </div>
+{     /* Data e hora no rodapé */}
 
-      {/* Data e hora no rodapé */}
-      <p className="mt-14 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase">
+      <p className="mt-14 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase text-center">
         16 DE JANEIRO DE 2027 — 16H
+      </p>
+      <p className="mt-3 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase text-center max-w-md">
+        Rua Josina Luiza Tupinambá, 1062, Morada Nova
       </p>
     </div>
   );
