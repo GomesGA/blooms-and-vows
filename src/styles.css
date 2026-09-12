@@ -165,8 +165,40 @@
     border-color: var(--color-border);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
+
+/* Watercolor floral frame used on cream sections */
+@utility floral-frame {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--floral-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.95;
+    pointer-events: none;
+  }
+}
+
+@utility tracking-wide-caps {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
