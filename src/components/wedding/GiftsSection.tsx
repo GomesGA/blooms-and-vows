@@ -1,8 +1,21 @@
 import { useState } from "react";
 
-// Lista de presentes com valores e links para as imagens locais
+// Lista de presentes com cotas de dinheiro primeiro, e itens físicos depois
 const initialGifts = [
-  // Eletrodomésticos e Casa
+  // Cotas e Dinheiro (Sem limite de quem pode dar, abre apenas o PIX)
+  { id: 21, name: "Mensalidade academia", price: "R$ 200", image: "/presentes/academia.jpg", pledged: false },
+  { id: 22, name: "Condomínio do mês", price: "R$ 300", image: "/presentes/condominio.jpg", pledged: false },
+  { id: 23, name: "Aluguel", price: "R$ 1500", image: "/presentes/aluguel.jpg", pledged: false },
+  { id: 24, name: "Gasolina da semana", price: "R$ 200", image: "/presentes/gasolina.jpg", pledged: false },
+  { id: 25, name: "Revisão do carro", price: "R$ 800", image: "/presentes/revisao.jpg", pledged: false },
+  { id: 26, name: "Pneu pro carro", price: "R$ 100", image: "/presentes/pneu.jpg", pledged: false },
+  { id: 27, name: "Ração pro cachorro", price: "R$ 150", image: "/presentes/racao.jpg", pledged: false },
+  { id: 28, name: "Jantar para o casal", price: "R$ 200", image: "/presentes/jantar.jpg", pledged: false },
+  { id: 29, name: "Corte de cabelo pra noiva", price: "R$ 90", image: "/presentes/cabelo-noiva.jpg", pledged: false },
+  { id: 30, name: "Barbearia do noivo", price: "R$ 100", image: "/presentes/cabelo-noivo.jpg", pledged: false },
+  { id: 31, name: "Lua de mel", price: "R$ 500", image: "/presentes/lua-de-mel.jpg", pledged: false },
+
+  // Eletrodomésticos e Casa (Ficam reservados após alguém escolher)
   { id: 1, name: "Ar condicionado", price: null, image: "/presentes/ar-condicionado.jpg", pledged: false },
   { id: 2, name: "Liquidificador", price: null, image: "/presentes/liquidificador.jpg", pledged: false },
   { id: 3, name: "Batedeira planetária", price: null, image: "/presentes/batedeira.jpg", pledged: false },
@@ -25,26 +38,16 @@ const initialGifts = [
   { id: 18, name: "Travessas vidro", price: null, image: "/presentes/travessas.jpg", pledged: false },
   { id: 19, name: "Panela de pressão", price: null, image: "/presentes/panela-pressao.jpg", pledged: false },
   { id: 20, name: "Pipoqueira", price: null, image: "/presentes/pipoqueira.jpg", pledged: false },
-  
-  // Cotas e Dinheiro
-  { id: 21, name: "Mensalidade academia", price: "R$ 200", image: "/presentes/academia.jpg", pledged: false },
-  { id: 22, name: "Condomínio do mês", price: "R$ 300", image: "/presentes/condominio.jpg", pledged: false },
-  { id: 23, name: "Aluguel", price: "R$ 1500", image: "/presentes/aluguel.jpg", pledged: false },
-  { id: 24, name: "Gasolina da semana", price: "R$ 200", image: "/presentes/gasolina.jpg", pledged: false },
-  { id: 25, name: "Revisão do carro", price: "R$ 800", image: "/presentes/revisao.jpg", pledged: false },
-  { id: 26, name: "Pneu pro carro", price: "R$ 100", image: "/presentes/pneu.jpg", pledged: false },
-  { id: 27, name: "Ração pro cachorro", price: "R$ 150", image: "/presentes/racao.jpg", pledged: false },
-  { id: 28, name: "Jantar para o casal", price: "R$ 200", image: "/presentes/jantar.jpg", pledged: false },
-  { id: 29, name: "Corte de cabelo pra noiva", price: "R$ 90", image: "/presentes/cabelo-noiva.jpg", pledged: false },
-  { id: 30, name: "Barbearia do noivo", price: "R$ 100", image: "/presentes/cabelo-noivo.jpg", pledged: false },
-  { id: 31, name: "Lua de mel", price: "R$ 500", image: "/presentes/lua-de-mel.jpg", pledged: false },
 ];
 
 export function GiftsSection() {
   const [gifts, setGifts] = useState(initialGifts);
   const [selectedGift, setSelectedGift] = useState<number | null>(null);
+  
+  // Novo estado apenas para exibir o PIX sem pedir nome ou bloquear o item
+  const [selectedPixGift, setSelectedPixGift] = useState<{name: string, price: string} | null>(null);
+  
   const [guestName, setGuestName] = useState("");
-  const [showPix, setShowPix] = useState(false);
 
   const handleConfirmGift = () => {
     if (!guestName.trim()) return;
@@ -63,61 +66,36 @@ export function GiftsSection() {
         backgroundPosition: "center",
       }}
     >
-      {/* Película semi-transparente para o texto não sumir nas flores */}
-      <div className="absolute inset-0 bg-[#FAF5EC]/90 z-0"></div>
-
       {/* Container do conteúdo que permite a rolagem */}
       <div className="relative z-10 w-full flex flex-col items-center py-20 px-4 min-h-max">
         
-        <h2 className="text-5xl md:text-6xl text-[#96691E] mb-4 text-center drop-shadow-sm" style={{ fontFamily: "'Alex Brush', cursive" }}>
+        <h2 className="text-5xl md:text-6xl text-[#96691E] mb-4 text-center drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
           Lista de Presentes
         </h2>
-        <p className="text-[#4A5543] text-lg md:text-xl font-serif text-center max-w-2xl mb-12">
+        <p className="text-[#4A5543] text-lg md:text-xl font-serif text-center max-w-2xl mb-16 drop-shadow-sm font-medium">
           Ajude a construir nossa vida de casados
         </p>
-
-        {/* Botão de PIX em Destaque */}
-        <div className="w-full max-w-4xl bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm border border-[#E5D5B8] flex flex-col items-center mb-16">
-          <h3 className="text-2xl font-serif text-[#2C3E2D] mb-4">Prefere contribuir em dinheiro?</h3>
-          <p className="text-center text-gray-600 mb-6 max-w-lg">
-            Qualquer valor é bem-vindo para nos ajudar a iniciar esta nova etapa.
-          </p>
-          <button 
-            onClick={() => setShowPix(true)}
-            className="bg-[#96691E] text-white px-8 py-3 rounded-full uppercase tracking-widest text-sm font-semibold hover:bg-[#7A5515] transition-colors shadow-md"
-          >
-            Contribuir com PIX
-          </button>
-
-          {showPix && (
-            <div className="mt-6 p-6 bg-[#FAF5EC] rounded-xl w-full max-w-md flex flex-col items-center animate-in fade-in zoom-in duration-300 shadow-inner">
-              <p className="text-sm uppercase tracking-widest text-[#7A6E58] mb-2">Chave PIX</p>
-              <p className="text-xl font-mono text-[#2C3E2D] font-bold mb-4">[SUA CHAVE PIX AQUI]</p>
-              <p className="text-xs text-center text-gray-500">Obrigado pela sua contribuição!</p>
-            </div>
-          )}
-        </div>
 
         {/* Grelha de Presentes */}
         <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {gifts.map((gift) => (
-            <div key={gift.id} className={`bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 transition-all ${gift.pledged ? 'opacity-60 grayscale' : 'hover:shadow-md hover:-translate-y-1'}`}>
+            <div key={gift.id} className={`bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 transition-all ${gift.pledged ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:-translate-y-1'}`}>
               <div className="h-48 w-full overflow-hidden bg-gray-100">
                 <img src={gift.image} alt={gift.name} className="w-full h-full object-cover" />
               </div>
               <div className="p-5 flex flex-col items-center h-[180px] justify-between">
-                <div className="text-center">
-                  <h4 className="font-serif text-[#2C3E2D] text-lg mb-1">{gift.name}</h4>
-                  {gift.price && <p className="text-[#96691E] font-semibold">{gift.price}</p>}
+                <div className="text-center w-full">
+                  <h4 className="font-serif text-[#2C3E2D] text-lg mb-1 leading-tight">{gift.name}</h4>
+                  {gift.price && <p className="text-[#96691E] font-semibold mt-2">Sugestão: {gift.price}</p>}
                 </div>
                 
-                {gift.pledged ? (
+                {gift.pledged && !gift.price ? (
                   <div className="w-full py-2 bg-gray-100 text-gray-500 text-center rounded-lg text-sm uppercase tracking-wider font-semibold border border-gray-200">
                     Já Presenteado
                   </div>
                 ) : (
                   <button 
-                    onClick={() => setSelectedGift(gift.id)}
+                    onClick={() => gift.price ? setSelectedPixGift({ name: gift.name, price: gift.price }) : setSelectedGift(gift.id)}
                     className="w-full py-2 bg-[#4A5543] text-white rounded-lg text-sm uppercase tracking-wider hover:bg-[#2C3E2D] transition-colors shadow-sm"
                   >
                     Presentear
@@ -130,12 +108,38 @@ export function GiftsSection() {
 
         {/* Rodapé da Secção */}
         <div className="mt-20 max-w-3xl text-center pb-12">
-          <p className="text-xl md:text-2xl text-[#96691E] font-serif italic drop-shadow-sm">
-            “Mais do que presentes, vocês estarão fazendo parte do começo da nossa história. Obrigado por celebrar esse momento com a gente! ❤️”
+          <p className="text-xl md:text-2xl text-[#96691E] font-serif italic drop-shadow-sm font-medium">
+            “Mais do que presentes, vocês estarão fazendo parte do começo da nossa história. Obrigado por celebrar esse momento com a gente! ❤️️”
           </p>
         </div>
 
-        {/* Modal para colocar o nome */}
+        {/* Modal 1: Informações do PIX (Para Cotas) */}
+        {selectedPixGift && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full animate-in zoom-in-95 duration-200">
+              <h3 className="text-2xl font-serif text-[#2C3E2D] mb-2 text-center">{selectedPixGift.name}</h3>
+              <p className="text-gray-600 text-center mb-6">
+                Muito obrigado por nos ajudar! Para contribuir (Sugestão: <strong>{selectedPixGift.price}</strong>), utilize a nossa chave PIX abaixo:
+              </p>
+              
+              <div className="p-6 bg-[#FAF5EC] rounded-xl flex flex-col items-center mb-6 shadow-inner border border-[#E5D5B8]">
+                <p className="text-sm uppercase tracking-widest text-[#7A6E58] mb-2">Chave PIX</p>
+                <p className="text-lg md:text-xl font-mono text-[#2C3E2D] font-bold text-center break-all">
+                  [COLOQUE SUA CHAVE AQUI]
+                </p>
+              </div>
+
+              <button 
+                onClick={() => setSelectedPixGift(null)}
+                className="w-full py-3 bg-[#96691E] text-white uppercase tracking-widest text-sm rounded-lg hover:bg-[#7A5515] transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 2: Confirmar Presente Físico (Pede Nome e Reserva) */}
         {selectedGift && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl p-8 max-w-md w-full animate-in zoom-in-95 duration-200">
