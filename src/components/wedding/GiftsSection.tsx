@@ -59,13 +59,13 @@ export function GiftsSection() {
 
   return (
     <section 
-      className="h-screen w-full snap-start overflow-y-auto relative"
+      className="h-screen w-full snap-start overflow-y-auto relative bg-[#FAF5EC]"
       style={{
-        backgroundImage: "url('/floral-rsvp-bg.jpg')",
+        backgroundImage: "url('/4.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-      }}
-    >
+        backgroundAttachment: "fixed" 
+      }}>
       {/* Container do conteúdo que permite a rolagem */}
       <div className="relative z-10 w-full flex flex-col items-center py-20 px-4 min-h-max">
         
