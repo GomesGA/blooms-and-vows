@@ -68,14 +68,7 @@ function Index() {
           </p>
         </div>
       </section>
-
-      {/* SEÇÃO 4: Lista de Presentes */}
-      <section className="h-screen w-full snap-start bg-[#FAF5EC] flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl">
-          <GiftsSection />
-        </div>
-      </section>
-      
+      <GiftsSection/>
     </div>
   );
 }
