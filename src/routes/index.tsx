@@ -10,8 +10,15 @@ export const Route = createFileRoute('/')({
 function Index() {
   return (
     // Adicionado scroll-smooth para transições mais fluidas e classes para esconder a barra de rolagem geral
-    <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory font-serif scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      
+    <div 
+          className="snap-y snap-mandatory h-screen overflow-y-scroll w-full flex flex-col"
+          style={{
+            backgroundImage: "url('/fundo-site.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed" // Isso faz a mágica: o fundo congela e o site rola por cima!
+          }}
+        >      
       {/* SEÇÃO 1: Apresentação (Usa o floral-frame.png) */}
       <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/1.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-[#F5EDDC]/40"></div>
