@@ -13,9 +13,7 @@ function Index() {
     <div className="snap-y snap-mandatory h-screen overflow-y-scroll w-full bg-[#FAF5EC]">
       
       {/* SEÇÃO 1: Apresentação */}
-      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-frame.jpg')] bg-cover bg-center bg-no-repeat">
-        <div className="absolute inset-0 bg-[#F5EDDC]/40"></div>
-        
+      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-frame.jpg')] bg-cover bg-center bg-no-repeat">        
         <div className="z-10 text-center flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto">
           <p className="text-sm md:text-base text-[#47512F] uppercase tracking-widest leading-relaxed">
             "Para que todos vejam e saibam e considerem e juntamente entendam que a mão do Senhor fez isto…"
