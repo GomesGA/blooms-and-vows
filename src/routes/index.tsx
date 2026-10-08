@@ -20,7 +20,7 @@ function Index() {
           }}
         >      
       {/* SEÇÃO 1: Apresentação (Usa o floral-frame.png) */}
-      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/1.jpg')] bg-cover bg-center bg-no-repeat">
+      <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-frame.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-[#F5EDDC]/40"></div>
         
         <div className="z-10 text-center flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto">
@@ -55,12 +55,12 @@ function Index() {
       </section>
 
       {/* SEÇÃO 2: Contagem Regressiva */}
-        <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative" style={{ backgroundImage: "url('/2.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[#4A5543]" >}}>
           <Countdown />
         </section>
 
       {/* SEÇÃO 3: RSVP (Usa o floral-rsvp-bg.jpg) */}
-      <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative" style={{ backgroundImage: "url('/3.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
+      <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative" style={{ backgroundImage: "url('/floral-rsvp-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
         <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col">
           {/* Área da lista conectada ao RsvpSection. A barra de rolagem foi ocultada aqui também. */}
           <div className="flex-1 overflow-y-auto w-full pt-12 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -73,7 +73,9 @@ function Index() {
           </p>
         </div>
       </section>
+
       <GiftsSection/>
+
     </div>
   );
 }

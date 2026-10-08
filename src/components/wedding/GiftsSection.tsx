@@ -61,7 +61,7 @@ export function GiftsSection() {
     <section 
       className="h-screen w-full snap-start overflow-y-auto relative bg-[#FAF5EC]"
       style={{
-        backgroundImage: "url('/4.jpg')",
+        backgroundImage: "url('/floral-gifts.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed" 
