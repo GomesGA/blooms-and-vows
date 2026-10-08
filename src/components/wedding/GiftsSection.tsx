@@ -59,13 +59,17 @@ export function GiftsSection() {
 
   return (
     <section 
-      className="h-screen w-full snap-start overflow-y-auto relative bg-[#FAF5EC]"
+      className="h-screen w-full snap-start overflow-y-auto relative bg-[#FAF5EC] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       style={{
-        backgroundImage: "url('/floral-gifts.jpg')",
+        backgroundImage: "url('/floral-gifts.jpg')", // Aponta para a imagem de alta qualidade
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed" 
-      }}>
+      }}
+    >
+      {/* Filtro ultra-leve para garantir que as flores não atrapalhem a leitura */}
+      <div className="absolute inset-0 bg-[#F5EDDC]/10 pointer-events-none"></div>
+
       {/* Container do conteúdo que permite a rolagem */}
       <div className="relative z-10 w-full flex flex-col items-center py-20 px-4 min-h-max">
         
@@ -109,7 +113,7 @@ export function GiftsSection() {
         {/* Rodapé da Secção */}
         <div className="mt-20 max-w-3xl text-center pb-12">
           <p className="text-xl md:text-2xl text-[#96691E] font-serif italic drop-shadow-sm font-medium">
-            “Mais do que presentes, vocês estarão fazendo parte do começo da nossa história. Obrigado por celebrar esse momento com a gente! ❤️️”
+            “Mais do que presentes, vocês estarão fazendo parte do começo da nossa história. Obrigado por celebrar esse momento com a gente! ❤️”
           </p>
         </div>
 
