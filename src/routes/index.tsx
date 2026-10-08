@@ -55,7 +55,9 @@ function Index() {
       </section>
 
       {/* SEÇÃO 2: Contagem Regressiva */}
-        <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[#4A5543]" >}}>
+      <section 
+        className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[#4A5543]"
+      >
           <Countdown />
         </section>
 
