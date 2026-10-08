@@ -9,17 +9,10 @@ export const Route = createFileRoute('/')({
 
 function Index() {
   return (
-    // Adicionado scroll-smooth para transições mais fluidas e classes para esconder a barra de rolagem geral
-    <div 
-          className="snap-y snap-mandatory h-screen overflow-y-scroll w-full flex flex-col"
-          style={{
-            backgroundImage: "url('/fundo-site.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed" // Isso faz a mágica: o fundo congela e o site rola por cima!
-          }}
-        >      
-      {/* SEÇÃO 1: Apresentação (Usa o floral-frame.png) */}
+    // Removido o 'flex flex-col' e o fundo global que estavam esmagando o layout
+    <div className="snap-y snap-mandatory h-screen overflow-y-scroll w-full bg-[#FAF5EC]">
+      
+      {/* SEÇÃO 1: Apresentação */}
       <section className="h-screen w-full snap-start relative flex flex-col items-center justify-center p-4 bg-[url('/floral-frame.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-[#F5EDDC]/40"></div>
         
@@ -54,29 +47,26 @@ function Index() {
         </div>
       </section>
 
-      {/* SEÇÃO 2: Contagem Regressiva */}
-      <section 
-        className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[#4A5543]"
-      >
-          <Countdown />
-        </section>
+      {/* SEÇÃO 2: Contagem Regressiva (Fundo Verde Original) */}
+      <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[#4A5543]">
+        <Countdown />
+      </section>
 
-      {/* SEÇÃO 3: RSVP (Usa o floral-rsvp-bg.jpg) */}
-      <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative" style={{ backgroundImage: "url('/floral-rsvp-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
+      {/* SEÇÃO 3: RSVP */}
+      <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center">
+        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
         <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col">
-          {/* Área da lista conectada ao RsvpSection. A barra de rolagem foi ocultada aqui também. */}
           <div className="flex-1 overflow-y-auto w-full pt-12 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <RsvpSection />
           </div>
-
-          {/* Mensagem de agradecimento com tamanho aumentado (text-xl md:text-2xl) */}
           <p className="text-center text-[#5C6A3E] pb-8 pt-2 text-xl md:text-2xl px-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             Agradecemos de coração a todos que poderão compartilhar esse momento tão especial conosco.
           </p>
         </div>
       </section>
 
-      <GiftsSection/>
+      {/* SEÇÃO 4: Lista de Presentes */}
+      <GiftsSection />
 
     </div>
   );
