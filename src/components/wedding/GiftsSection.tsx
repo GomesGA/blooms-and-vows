@@ -59,24 +59,18 @@ export function GiftsSection() {
 
   return (
     <section 
-      className="h-screen w-full snap-start overflow-y-auto relative bg-[#FAF5EC] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-      style={{
-        backgroundImage: "url('/floral-gifts.jpg')", // Aponta para a imagem de alta qualidade
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed" 
-      }}
+      // O fundo agora é o verde sólido bg-[#4A5543] igual à seção 2, e sem barras duplas!
+      className="h-screen w-full snap-start overflow-y-auto relative bg-[#4A5543] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
     >
-      {/* Filtro ultra-leve para garantir que as flores não atrapalhem a leitura */}
-      <div className="absolute inset-0 bg-[#F5EDDC]/10 pointer-events-none"></div>
-
       {/* Container do conteúdo que permite a rolagem */}
       <div className="relative z-10 w-full flex flex-col items-center py-20 px-4 min-h-max">
         
-        <h2 className="text-5xl md:text-6xl text-[#96691E] mb-4 text-center drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
+        {/* Título alterado para creme/dourado claro para destacar no fundo verde */}
+        <h2 className="text-5xl md:text-6xl text-[#E5D5B8] mb-4 text-center drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
           Lista de Presentes
         </h2>
-        <p className="text-[#4A5543] text-lg md:text-xl font-serif text-center max-w-2xl mb-16 drop-shadow-sm font-medium">
+        {/* Subtítulo alterado para cor clara para leitura no fundo verde */}
+        <p className="text-[#FAF5EC] text-lg md:text-xl font-serif text-center max-w-2xl mb-16 drop-shadow-sm font-medium">
           Ajude a construir nossa vida de casados
         </p>
 
@@ -110,9 +104,9 @@ export function GiftsSection() {
           ))}
         </div>
 
-        {/* Rodapé da Secção */}
+        {/* Rodapé da Secção - Texto alterado para claro */}
         <div className="mt-20 max-w-3xl text-center pb-12">
-          <p className="text-xl md:text-2xl text-[#96691E] font-serif italic drop-shadow-sm font-medium">
+          <p className="text-xl md:text-2xl text-[#E5D5B8] font-serif italic drop-shadow-sm font-medium">
             “Mais do que presentes, vocês estarão fazendo parte do começo da nossa história. Obrigado por celebrar esse momento com a gente! ❤️”
           </p>
         </div>
