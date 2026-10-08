@@ -54,7 +54,6 @@ function Index() {
 
       {/* SEÇÃO 3: RSVP */}
       <section className="h-screen w-full snap-start flex flex-col items-center justify-center relative bg-[url('/floral-rsvp-bg.jpg')] bg-cover bg-center">
-        <div className="absolute inset-0 bg-[#F5EDDC]/60"></div>
         <div className="z-10 w-full max-w-3xl mx-auto h-full flex flex-col">
           <div className="flex-1 overflow-y-auto w-full pt-12 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <RsvpSection />
