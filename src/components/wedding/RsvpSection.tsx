@@ -53,11 +53,7 @@ export function RsvpSection() {
       if (!error && data) {
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
         data.forEach(row => {
-          // Achar o ID do convidado com base no nome salvo no banco
-          const guest = guestsList.find(g => g.name === row.guest_name);
-          if (guest) {
-            initialStatuses[guest.id] = row.attending ? 'yes' : 'no';
-          }
+          initialStatuses[row.guest_id] = row.status as 'yes' | 'no';
         });
         setStatuses(initialStatuses);
       }
@@ -83,9 +79,10 @@ export function RsvpSection() {
 
     // 2. Salva no Supabase (com aviso de erro caso falhe)
     const { error: supabaseError } = await supabase.from('rsvps').upsert({
-      guest_name: currentGuest.name,
-      attending: status === 'yes'
-    }, { onConflict: 'guest_name' });
+      guest_id: currentGuest.id,
+      name: currentGuest.name,
+      status: status
+    }, { onConflict: 'guest_id' });
 
     if (supabaseError) {
       console.error("ERRO SUPABASE:", supabaseError.message);

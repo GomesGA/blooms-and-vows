@@ -16,25 +16,19 @@ export type Database = {
     Tables: {
       rsvps: {
         Row: {
-          attending: boolean
-          created_at: string
-          guest_name: string
-          id: string
-          updated_at: string
+          guest_id: string
+          name: string
+          status: string
         }
         Insert: {
-          attending: boolean
-          created_at?: string
-          guest_name: string
-          id?: string
-          updated_at?: string
+          guest_id: string
+          name: string
+          status: string
         }
         Update: {
-          attending?: boolean
-          created_at?: string
-          guest_name?: string
-          id?: string
-          updated_at?: string
+          guest_id?: string
+          name?: string
+          status?: string
         }
         Relationships: []
       }
