@@ -45,6 +45,8 @@ export function RsvpSection() {
   // Sua URL oficial do Google Sheets (apenas para registro em background)
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPXeYG-M-N1lCrn8DDwYI1T7dxkQZf3hfNS-PK1hCwTMiwwWdHDg8hIfcW4VIxtCfH/exec";
 
+  const [dbIds, setDbIds] = useState<Record<string, string>>({});
+
   // LER DADOS DO SUPABASE (Muito mais rápido)
   useEffect(() => {
     const fetchSupabase = async () => {
@@ -52,10 +54,20 @@ export function RsvpSection() {
       
       if (!error && data) {
         const initialStatuses: Record<string, 'yes' | 'no'> = {};
+        const newDbIds: Record<string, string> = {};
+        
         data.forEach(row => {
-          initialStatuses[row.guest_id] = row.status as 'yes' | 'no';
+          // PROCURA PELO NOME, NÃO PELO ID!
+          // Isso evita que a lista quebre se você adicionar/remover nomes da lista no código.
+          const guest = guestsList.find(g => g.name === row.name);
+          if (guest) {
+            initialStatuses[guest.id] = row.status as 'yes' | 'no';
+            newDbIds[guest.id] = row.guest_id; // Salva o ID real que está no banco
+          }
         });
+        
         setStatuses(initialStatuses);
+        setDbIds(newDbIds);
       }
     };
     
@@ -77,9 +89,12 @@ export function RsvpSection() {
     setStatuses(prev => ({ ...prev, [currentGuest.id]: status }));
     setSelectedGuest(null);
 
+    // Usa o ID que já existe no banco. Se for a primeira vez, usa o NOME como ID (para nunca colidir com os "g69" antigos)
+    const actualDbId = dbIds[currentGuest.id] || currentGuest.name;
+
     // 2. Salva no Supabase (com aviso de erro caso falhe)
     const { error: supabaseError } = await supabase.from('rsvps').upsert({
-      guest_id: currentGuest.id,
+      guest_id: actualDbId,
       name: currentGuest.name,
       status: status
     }, { onConflict: 'guest_id' });
