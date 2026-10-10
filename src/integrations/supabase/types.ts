@@ -38,6 +38,27 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_reservations: {
+        Row: {
+          id: string
+          gift_id: number
+          guest_name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          gift_id: number
+          guest_name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          gift_id?: number
+          guest_name?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -189,3 +189,136 @@
   text-transform: uppercase;
 }
 
+/*
+ * Fundo floral do convite usado em todas as telas.
+ * As telas alternam entre a imagem normal e a imagem espelhada na vertical
+ * (floral-page-flip). Assim, a borda de baixo de uma tela é exatamente o
+ * reflexo da borda de cima da próxima: as flores "continuam" de uma página
+ * para a outra, como metade da flor em cada tela.
+ *
+ * Importante: o conteúdo dentro da seção precisa ter `relative` para ficar
+ * por cima das flores. Não usamos isolation/z-index aqui para que os modais
+ * (fixed z-50) continuem por cima de tudo.
+ */
+@utility floral-page {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/floral-frame.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+}
+
+@utility floral-page-flip {
+  &::before {
+    transform: scaleY(-1);
+  }
+}
+
+/* Leve "zoom out" das flores ao abrir o site (apenas na primeira tela) */
+@utility floral-page-intro {
+  &::before {
+    animation: floral-intro 3.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@theme {
+  --animate-fade-up: fade-up 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-sway: sway 6s ease-in-out infinite;
+  --animate-tick: tick 0.5s ease-out both;
+  --animate-scroll-hint: scroll-hint 2.2s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes sway {
+    0%,
+    100% {
+      transform: rotate(-1.2deg);
+    }
+    50% {
+      transform: rotate(1.2deg);
+    }
+  }
+
+  @keyframes tick {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scroll-hint {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(8px);
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes floral-intro {
+  from {
+    transform: scale(1.08);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pétalas caindo suavemente pela tela */
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  50% {
+    transform: translate3d(var(--petal-drift, 40px), 50vh, 0) rotate(180deg);
+  }
+  90% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  100% {
+    transform: translate3d(calc(var(--petal-drift, 40px) * -0.5), 110vh, 0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floral-page-intro::before,
+  .petal {
+    animation: none !important;
+  }
+  .petal {
+    display: none;
+  }
+}
+

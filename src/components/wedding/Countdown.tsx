@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Reveal } from "@/components/Reveal";
+import { FloralDivider } from "./FloralDivider";
 
 export function Countdown() {
   const [timeLeft, setTimeLeft] = useState({
@@ -12,7 +14,10 @@ export function Countdown() {
     // Definindo a data: 16 de Janeiro de 2027 às 16:00
     const targetDate = new Date("2027-01-16T16:00:00").getTime();
 
-    const interval = setInterval(() => {
+    const interval = setInterval(() => tick(), 1000);
+    tick(); // calcula na hora, sem esperar 1 segundo
+
+    function tick() {
       const now = new Date().getTime();
       const difference = targetDate - now;
 
@@ -24,7 +29,7 @@ export function Countdown() {
           segundos: Math.floor((difference % (1000 * 60)) / 1000),
         });
       }
-    }, 1000);
+    }
 
     return () => clearInterval(interval);
   }, []);
@@ -32,44 +37,52 @@ export function Countdown() {
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
   return (
-    <div className="flex flex-col items-center justify-center w-full px-4 text-white">
-      <h2 className="text-5xl md:text-6xl text-[#F9F7F1] mb-6 font-normal drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
-        Contagem Regressiva
-      </h2>
-      
-      {/* Divisor decorativo (Linha fina com losango no meio) */}
-      <div className="flex items-center gap-3 mb-14">
-        <div className="w-16 h-[1px] bg-[#C19B5E]"></div>
-        <div className="w-1.5 h-1.5 rotate-45 bg-[#C19B5E]"></div>
-        <div className="w-16 h-[1px] bg-[#C19B5E]"></div>
-      </div>
+    <div className="flex flex-col items-center justify-center w-full px-4">
+      <Reveal>
+        <h2 className="text-5xl md:text-7xl text-[#96691E] mb-2 font-normal text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
+          Contagem Regressiva
+        </h2>
+      </Reveal>
+
+      {/* Divisor floral em aquarela */}
+      <Reveal delay={150} className="mb-10">
+        <FloralDivider />
+      </Reveal>
 
       {/* Caixas do Cronômetro */}
-      <div className="flex gap-4 md:gap-6 justify-center">
-        {Object.entries(timeLeft).map(([unit, value]) => (
-          <div key={unit} className="flex flex-col items-center">
-            {/* Caixa creme */}
-            <div className="bg-[#FAF5EC] w-20 h-24 md:w-[110px] md:h-[130px] rounded-2xl flex flex-col items-center justify-center shadow-xl">
-              {/* Número serifado e verde escuro */}
-              <span className="text-4xl md:text-5xl text-[#2C3E2D]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+      <div className="flex gap-3 md:gap-6 justify-center">
+        {Object.entries(timeLeft).map(([unit, value], i) => (
+          <Reveal key={unit} delay={250 + i * 120}>
+            {/* Caixa translúcida com borda dourada */}
+            <div className="bg-white/60 backdrop-blur-[2px] border border-[#C19B5E]/50 w-[72px] h-24 md:w-[120px] md:h-[140px] rounded-2xl flex flex-col items-center justify-center shadow-[0_10px_30px_-10px_rgba(74,85,67,0.35)] transition-transform duration-500 hover:-translate-y-1">
+              {/* Número serifado e verde escuro (anima a cada mudança) */}
+              <span
+                key={value}
+                className="text-4xl md:text-6xl text-[#4A5543] animate-tick"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              >
                 {formatNumber(value)}
               </span>
               {/* Rótulo dourado */}
-              <span className="text-[9px] md:text-[10px] text-[#B8842E] uppercase tracking-[0.25em] mt-3 font-semibold">
+              <span className="text-[9px] md:text-[11px] text-[#96691E] uppercase tracking-[0.25em] mt-2 md:mt-3 font-semibold">
                 {unit}
               </span>
             </div>
-          </div>
+          </Reveal>
         ))}
       </div>
-{     /* Data e hora no rodapé */}
 
-      <p className="mt-14 text-[#C19B5E] text-xs md:text-sm tracking-[0.3em] uppercase text-center">
-        16 DE JANEIRO DE 2027 — 16H
-      </p>
-      <p className="mt-6 text-4xl md:text-5xl text-[#FAF5EC] text-center drop-shadow-md" style={{ fontFamily: "'Alex Brush', cursive" }}>
-        Rua Josina Luiza Tupinambá, 1062, Morada Nova
-      </p>
+      {/* Data e hora no rodapé */}
+      <Reveal delay={800}>
+        <p className="mt-12 text-[#5C6A3E] text-xs md:text-sm tracking-[0.3em] uppercase text-center font-semibold">
+          16 de Janeiro de 2027 — 16h
+        </p>
+      </Reveal>
+      <Reveal delay={950}>
+        <p className="mt-4 text-3xl md:text-5xl text-[#96691E] text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
+          Rua Josina Luiza Tupinambá, 1062, Morada Nova
+        </p>
+      </Reveal>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { FloralDivider } from "./FloralDivider";
 
 const rawGuests = [
   "ABIGAIL DE JESUS", "ADAUTO GOMES", "ALESSANDRO MACHADO", "ALEUDA DE FATIMA",
@@ -110,6 +111,7 @@ export function RsvpSection() {
         <h2 className="text-6xl md:text-7xl text-[#96691E] mb-2 drop-shadow-sm text-center" style={{ fontFamily: "'Alex Brush', cursive" }}>
           Confirme sua Presença
         </h2>
+        <FloralDivider className="w-52 md:w-64 mb-3" />
         <p className="text-[#7A6E58] text-center max-w-lg mb-6 text-sm md:text-base drop-shadow-sm">
           Encontre seu nome na lista abaixo e nos informe se poderá celebrar este dia conosco.
         </p>
