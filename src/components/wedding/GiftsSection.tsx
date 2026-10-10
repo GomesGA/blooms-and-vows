@@ -97,6 +97,7 @@ export function GiftsSection() {
       keepalive: true,
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
+        tipo: 'presente',
         nome: guestName,
         status: `Presenteou: ${giftToReserve?.name}`
       }),
